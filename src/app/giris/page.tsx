@@ -33,6 +33,11 @@ function GirisPageInner() {
         router.push(redirectTo);
       }
     } else {
+      if (password.length < 6) {
+        setError('Şifre en az 6 karakter olmalıdır.');
+        setLoading(false);
+        return;
+      }
       const { error: err } = await supabase.auth.signUp({ email, password });
       if (err) { setError('Kayıt sırasında bir hata oluştu. Lütfen tekrar deneyin.'); setLoading(false); return; }
       setSuccess('Kayıt başarılı! E-posta adresinize bir onay bağlantısı gönderdik.');
@@ -100,13 +105,13 @@ function GirisPageInner() {
             </div>
             <div>
               <label className="form-label" htmlFor="password">Şifre</label>
-              <input id="password" type="password" required value={password} onChange={e => setPassword(e.target.value)}
+              <input id="password" type="password" required minLength={6} value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
                 style={inputStyle}
                 onFocus={e => e.target.style.borderColor = 'var(--accent)'}
                 onBlur={e => e.target.style.borderColor = 'var(--border)'}
               />
-              {mode === 'register' && <p style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif', marginTop: 4 }}>En az 8 karakter</p>}
+              {mode === 'register' && <p style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif', marginTop: 4 }}>En az 6 karakter</p>}
             </div>
 
             {/* Errors */}
