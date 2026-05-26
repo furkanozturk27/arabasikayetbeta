@@ -5,15 +5,15 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAppStore } from '@/store/appStore';
 import { getTrustLabel } from '@/lib/utils';
-import { User, Shield, AlertTriangle, BookOpen, LogOut, Star, ChevronRight, Loader, ArrowRight } from 'lucide-react';
+import { User, Shield, AlertTriangle, BookOpen, LogOut, Star, ChevronRight, Loader, ArrowRight, Rocket, CheckCircle, Award, Handshake, Trophy } from 'lucide-react';
 import Link from 'next/link';
 
-const BADGE_INFO: Record<string, { emoji: string; label: string; desc: string }> = {
-  first_complaint:  { emoji: '🚀', label: 'İlk Şikayet', desc: 'En az 1 şikayet bildirdin.' },
-  verified_owner:   { emoji: '✅', label: 'Doğrulanmış Sahip', desc: 'Bir aracın şasisini doğruladın.' },
-  trusted_reporter: { emoji: '⭐', label: 'Güvenilir Profil', desc: '50+ güven puanına ulaştın.' },
-  community_helper: { emoji: '🤝', label: 'Topluluk Yardımcısı', desc: 'Şikayetin faydalı bulundu.' },
-  veteran_driver:   { emoji: '🏆', label: 'Veteran Sürücü', desc: '3+ araç günlüğü kaydı tuttun.' },
+const BADGE_INFO: Record<string, { Icon: any; label: string; desc: string }> = {
+  first_complaint:  { Icon: Rocket,      label: 'İlk Şikayet',          desc: 'En az 1 Şikayet bildirdin.' },
+  verified_owner:   { Icon: CheckCircle, label: 'Doğrulanmış Sahip',    desc: 'Bir aracın şasisisini doğruladın.' },
+  trusted_reporter: { Icon: Star,        label: 'Güvenilir Profil',     desc: '50+ güven puanına ulaştın.' },
+  community_helper: { Icon: Handshake,   label: 'Topluluk Yardımcısı', desc: 'Şikayetin faydalı bulundu.' },
+  veteran_driver:   { Icon: Trophy,      label: 'Veteran Sürücu',       desc: '3+ araç günlüğü kaydı tuttun.' },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -25,10 +25,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const VERDICT_PILL: Record<string, { label: string; cls: string }> = {
-  chronic:    { label: '🚨 Kronik',   cls: 'pill pill-chronic'   },
-  common:     { label: '⚠️ Yaygın',   cls: 'pill pill-recurring' },
-  isolated:   { label: '🔍 İzole',    cls: 'pill pill-info'      },
-  user_error: { label: '💡 Kullanım', cls: 'pill pill-neutral'   },
+  chronic:    { label: 'Kronik',          cls: 'pill pill-chronic'   },
+  common:     { label: 'Yaşgın',          cls: 'pill pill-recurring' },
+  isolated:   { label: 'İzole',            cls: 'pill pill-info'      },
+  user_error: { label: 'Kullanım Hatası', cls: 'pill pill-neutral'   },
 };
 
 export default function ProfilPage() {
@@ -217,6 +217,7 @@ export default function ProfilPage() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, 1fr)', gap: 8 }}>
           {Object.entries(BADGE_INFO).map(([type, info]) => {
             const isUnlocked = (earnedBadges as any)[type];
+            const { Icon } = info;
             return (
               <div
                 key={type}
@@ -234,7 +235,13 @@ export default function ProfilPage() {
                   transition: 'all var(--ease)',
                 }}
               >
-                <span style={{ fontSize: 24 }}>{info.emoji}</span>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 8,
+                  background: isUnlocked ? 'var(--accent-light)' : 'var(--bg-3)',
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                }}>
+                  <Icon size={16} style={{ color: isUnlocked ? 'var(--accent)' : 'var(--text-3)' }} />
+                </div>
                 <span style={{ fontSize: 10, color: isUnlocked ? 'var(--accent-text)' : 'var(--text-3)', fontFamily: 'DM Sans, sans-serif', textAlign: 'center', fontWeight: isUnlocked ? 500 : 400, lineHeight: 1.3 }}>
                   {info.label}
                 </span>

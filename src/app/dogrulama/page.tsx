@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Shield, Phone, Car, FileText, ChevronRight, Star, Loader, Check, AlertCircle } from 'lucide-react';
+import { Shield, Phone, Car, FileText, ChevronRight, Star, Loader, Check, AlertCircle, Rocket, CheckCircle, Award, Handshake, Trophy } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useAppStore } from '@/store/appStore';
 import Link from 'next/link';
@@ -46,11 +46,11 @@ const METHODS = [
 ];
 
 const BADGES = [
-  { type: 'first_complaint',  emoji: '🚀', title: 'İlk Şikayet',          desc: 'İlk şikayetini bildirdin.' },
-  { type: 'verified_owner',   emoji: '✅', title: 'Doğrulanmış Sahip',    desc: 'Araç sahipliğini doğruladın.' },
-  { type: 'trusted_reporter', emoji: '⭐', title: 'Güvenilir Raporlayıcı', desc: '50+ güven puanına ulaştın.' },
-  { type: 'community_helper', emoji: '🤝', title: 'Topluluk Yardımcısı',  desc: '10+ şikayet faydalı bulundu.' },
-  { type: 'veteran_driver',   emoji: '🏆', title: 'Veteran Sürücü',        desc: '3+ araç günlüğü kaydı tutuldu.' },
+  { type: 'first_complaint',  Icon: Rocket,      title: 'İlk Şikayet',            desc: 'İlk şikayetini bildirdin.' },
+  { type: 'verified_owner',   Icon: CheckCircle, title: 'Doğrulanmış Sahip',     desc: 'Araç sahipliğini doğruladın.' },
+  { type: 'trusted_reporter', Icon: Star,        title: 'Güvenilir Raporlayıcı', desc: '50+ güven puanına ulaştın.' },
+  { type: 'community_helper', Icon: Handshake,   title: 'Topluluk Yardımcısı',   desc: '10+ Şikayet faydalı bulundu.' },
+  { type: 'veteran_driver',   Icon: Trophy,      title: 'Veteran Sürücu',         desc: '3+ araç günlüğü kaydı tutuldu.' },
 ];
 
 export default function DogrulamaPage() {
@@ -244,7 +244,7 @@ export default function DogrulamaPage() {
         </h1>
         <p style={{ fontSize: 14, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif', lineHeight: 1.6, maxWidth: 480 }}>
           Doğrulama adımlarını tamamlayarak güven puanınızı yükseltin.
-          Yüksek puanlı kullanıcıların şikayetleri AI analizinde ve kronik sorun hesaplamalarında daha yüksek öncelik taşır.
+          Yüksek puanlı kullanıcıların şikayetleri ve kronik sorun hesaplamalarında daha yüksek öncelik taşır.
         </p>
       </div>
 
@@ -274,7 +274,7 @@ export default function DogrulamaPage() {
               {currentScore >= 100 ? 'Doğrulanmış Sürücü seviyesindesiniz. Katkılarınız için teşekkürler!' : 'Doğrulama adımlarını tamamlayarak puanınızı artırın.'}
             </p>
             <span className={`pill ${currentScore >= 50 ? 'pill-resolved' : 'pill-neutral'}`}>
-              {currentScore >= 100 ? '⭐ Güvenilir Profil' : currentScore >= 35 ? 'Doğrulanmış Sahip' : 'Doğrulanmamış'}
+              {currentScore >= 100 ? 'Güvenilir Profil' : currentScore >= 35 ? 'Doğrulanmış Sahip' : 'Doğrulanmamış'}
             </span>
           </div>
           {!user && (
@@ -465,16 +465,21 @@ export default function DogrulamaPage() {
       </h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(180px, 1fr))', gap: 10 }}>
         {BADGES.map(b => {
-          // Check if user earned this badge
           let earned = false;
           if (user) {
             if (b.type === 'trusted_reporter' && currentScore >= 50) earned = true;
             if (b.type === 'verified_owner' && completedTypes.includes('vin')) earned = true;
-            // Let profile page compute all complex ones, but sync simple ones here
           }
+          const { Icon } = b;
           return (
             <div key={b.type} className="card" style={{ padding: 16, opacity: earned ? 1 : 0.45, border: earned ? '1px solid var(--accent)' : '1px solid var(--border)' }}>
-              <div style={{ fontSize: 32, marginBottom: 8 }}>{b.emoji}</div>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8, marginBottom: 8,
+                background: earned ? 'var(--accent-light)' : 'var(--bg-3)',
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <Icon size={18} style={{ color: earned ? 'var(--accent)' : 'var(--text-3)' }} />
+              </div>
               <div style={{ fontSize: 13, fontWeight: 500, color: 'var(--text-1)', fontFamily: 'DM Sans, sans-serif', marginBottom: 4 }}>{b.title}</div>
               <div style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif', lineHeight: 1.5 }}>{b.desc}</div>
             </div>

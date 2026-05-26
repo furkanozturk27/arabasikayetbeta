@@ -29,7 +29,21 @@ function GirisPageInner() {
       if (err) { setError('E-posta veya şifre hatalı. Lütfen tekrar deneyin.'); setLoading(false); return; }
       if (data.user) {
         const { data: profile } = await supabase.from('users').select('*').eq('id', data.user.id).single();
-        if (profile) setUser(profile);
+        if (profile) {
+          setUser(profile);
+        } else {
+          // Profile row may not exist yet for brand-new users — fall back to auth session data
+          setUser({
+            id: data.user.id,
+            email: data.user.email!,
+            full_name: data.user.user_metadata?.full_name || null,
+            avatar_url: data.user.user_metadata?.avatar_url || null,
+            trust_score: 0,
+            verified_at: null,
+            created_at: data.user.created_at,
+            updated_at: new Date().toISOString(),
+          });
+        }
         router.push(redirectTo);
       }
     } else {

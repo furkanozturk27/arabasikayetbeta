@@ -2,14 +2,14 @@ import { createClient } from '@/lib/supabase/server';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { formatDate, formatKm, getSeverityLabel } from '@/lib/utils';
-import { Car, Gauge, Calendar, User, ArrowLeft } from 'lucide-react';
+import { Car, Gauge, Calendar, User, ArrowLeft, AlertTriangle, TrendingUp, Info, CheckCircle } from 'lucide-react';
 import { AiAnalysisCard } from '@/components/AiAnalysisCard';
 
 const VERDICT_CONFIG = {
-  chronic:    { label: 'Kronik Sorun',    cls: 'pill pill-chronic',   border: 'var(--chronic)',   bg: '#FDF7F6', icon: '🚨' },
-  common:     { label: 'Yaygın Sorun',    cls: 'pill pill-recurring', border: 'var(--recurring)', bg: '#FFFBF0', icon: '⚠️' },
-  isolated:   { label: 'İzole Vaka',      cls: 'pill pill-info',      border: 'var(--info)',      bg: '#F0F5FF', icon: '🔍' },
-  user_error: { label: 'Kullanım Hatası', cls: 'pill pill-neutral',   border: 'var(--border)',    bg: 'var(--bg-2)', icon: '💡' },
+  chronic:    { label: 'Kronik Sorun',    cls: 'pill pill-chronic',   border: 'var(--chronic)',   bg: '#FDF7F6' },
+  common:     { label: 'Yaygın Sorun',    cls: 'pill pill-recurring', border: 'var(--recurring)', bg: '#FFFBF0' },
+  isolated:   { label: 'İzole Vaka',      cls: 'pill pill-info',      border: 'var(--info)',      bg: '#F0F5FF' },
+  user_error: { label: 'Kullanım Hatası', cls: 'pill pill-neutral',   border: 'var(--border)',    bg: 'var(--bg-2)' },
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -57,7 +57,8 @@ export default async function ComplaintDetailPage({ params, searchParams }: {
           fontSize: 14, color: 'var(--resolved)', fontFamily: 'DM Sans, sans-serif',
           display: 'flex', alignItems: 'center', gap: 8,
         }}>
-          ✅ Şikayetiniz başarıyla kaydedildi. AI analizi aşağıda görüntüleniyor.
+          <CheckCircle size={16} style={{ flexShrink: 0 }} />
+          Şikayetiniz başarıyla kaydedildi.
         </div>
       )}
 
@@ -80,7 +81,7 @@ export default async function ComplaintDetailPage({ params, searchParams }: {
       </h1>
 
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
-        {complaint.is_chronic && <span className="pill pill-chronic">🚨 Kronik</span>}
+        {complaint.is_chronic && <span className="pill pill-chronic">Kronik</span>}
         {complaint.is_recurring && <span className="pill pill-recurring">Tekrarlayan</span>}
         <span className="pill pill-neutral">{getSeverityLabel(complaint.severity)} ({complaint.severity}/5)</span>
       </div>

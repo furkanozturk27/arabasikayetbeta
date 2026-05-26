@@ -2,7 +2,10 @@
 
 import Link from 'next/link';
 import { useEffect, useState, useRef } from 'react';
-import { AlertTriangle, Search, ArrowRight, CheckCircle, Brain, TrendingUp } from 'lucide-react';
+import {
+  AlertTriangle, Search, ArrowRight, CheckCircle, TrendingUp,
+  Wrench, Settings, Disc, Zap, Car, Wind, ChevronRight,
+} from 'lucide-react';
 
 /* ---- Animated counter ---- */
 function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
@@ -26,45 +29,36 @@ function Counter({ to, suffix = '' }: { to: number; suffix?: string }) {
   return <span ref={ref}>{val.toLocaleString('tr-TR')}{suffix}</span>;
 }
 
-/* ---- AI loading steps ---- */
-const AI_STEPS = ['Taranıyor…', 'Analiz ediliyor…', 'Tamamlanıyor…'];
-
 const CATEGORIES = [
-  { key: 'engine',       label: 'Motor',            emoji: '🔧', count: 12 },
-  { key: 'transmission', label: 'Şanzıman',         emoji: '⚙️', count: 8  },
-  { key: 'brakes',       label: 'Frenler',          emoji: '🛑', count: 6  },
-  { key: 'electrical',   label: 'Elektrik',         emoji: '⚡', count: 9  },
-  { key: 'suspension',   label: 'Süspansiyon',      emoji: '🏎️', count: 4  },
-  { key: 'ac_heating',   label: 'Klima',            emoji: '❄️', count: 5  },
+  { key: 'engine',       label: 'Motor',       Icon: Wrench,    count: 12 },
+  { key: 'transmission', label: 'Şanzıman',    Icon: Settings,  count: 8  },
+  { key: 'brakes',       label: 'Frenler',     Icon: Disc,      count: 6  },
+  { key: 'electrical',   label: 'Elektrik',    Icon: Zap,       count: 9  },
+  { key: 'suspension',   label: 'Süspansiyon', Icon: Car,       count: 4  },
+  { key: 'ac_heating',   label: 'Klima',       Icon: Wind,      count: 5  },
 ];
 
 const RECENT_COMPLAINTS = [
-  { id: 'demo-1', brand: 'Volkswagen', model: 'Golf', year: 2021, category: 'Şanzıman', symptom: 'Vites geçmiyor, sertleşme', km: 42000, verdict: 'chronic',  ago: '2 dk önce' },
-  { id: 'demo-2', brand: 'Toyota',     model: 'Corolla', year: 2022, category: 'Elektrik', symptom: 'Akü sorunu, kontak problemi', km: 28500, verdict: 'common',   ago: '15 dk önce' },
-  { id: 'demo-3', brand: 'Renault',    model: 'Clio', year: 2021, category: 'Motor', symptom: 'Güç kaybı, titreşim', km: 61200, verdict: 'isolated', ago: '1 sa önce' },
+  { id: 'demo-1', brand: 'Volkswagen', model: 'Golf',   year: 2021, category: 'Şanzıman', symptom: 'Vites geçmiyor, sertleşme',        km: 42000, verdict: 'chronic',  ago: '2 dk önce'  },
+  { id: 'demo-2', brand: 'Toyota',     model: 'Corolla', year: 2022, category: 'Elektrik', symptom: 'Akü sorunu, kontak problemi',       km: 28500, verdict: 'common',   ago: '15 dk önce' },
+  { id: 'demo-3', brand: 'Renault',    model: 'Clio',    year: 2021, category: 'Motor',    symptom: 'Güç kaybı, titreşim',              km: 61200, verdict: 'isolated', ago: '1 sa önce'  },
 ];
 
 const VERDICT_PILL: Record<string, { label: string; cls: string }> = {
-  chronic:  { label: 'Kronik',   cls: 'pill pill-chronic'   },
-  common:   { label: 'Yaygın',   cls: 'pill pill-recurring' },
-  isolated: { label: 'İzole',    cls: 'pill pill-info'      },
+  chronic:  { label: 'Kronik',  cls: 'pill pill-chronic'   },
+  common:   { label: 'Yaygın',  cls: 'pill pill-recurring' },
+  isolated: { label: 'İzole',   cls: 'pill pill-info'      },
 };
 
 const TIMELINE_STEPS = [
-  { icon: '🚗', title: 'Araç seçimi', desc: 'Kullanıcı Volkswagen Golf 2021 1.5 TSI seçti.' },
-  { icon: '⚙️', title: 'Şikayet bildirimi', desc: 'DSG şanzımanda sertleşme, 42.000 km\'de başladı.' },
-  { icon: '🤖', title: 'AI analizi', desc: 'Claude modeli 8 benzer vakayı inceledi.' },
-  { icon: '🚨', title: 'Kronik tespiti', desc: 'Bu model için %34 kronik sorun oranı belirlendi.' },
+  { Icon: Car,           title: 'Araç seçimi',         desc: 'Kullanıcı Volkswagen Golf 2021 1.5 TSI seçti.'             },
+  { Icon: Settings,      title: 'Şikayet bildirimi',   desc: "DSG şanzımanda sertleşme, 42.000 km'de başladı."          },
+  { Icon: TrendingUp,    title: 'Veri karşılaştırması', desc: '8 benzer şikayet ile karşılaştırıldı.'                    },
+  { Icon: AlertTriangle, title: 'Kronik tespiti',       desc: 'Bu model için kronik sorun eşiği aşıldı.'                 },
 ];
 
 export default function HomePage() {
-  const [aiStep, setAiStep] = useState(0);
   const [timelineActive, setTimelineActive] = useState(-1);
-
-  useEffect(() => {
-    const t = setInterval(() => setAiStep(s => (s + 1) % AI_STEPS.length), 1600);
-    return () => clearInterval(t);
-  }, []);
 
   useEffect(() => {
     let i = 0;
@@ -92,8 +86,7 @@ export default function HomePage() {
             <em style={{ color: 'var(--accent)', fontStyle: 'normal' }}>gerçekleri öğren</em>
           </h1>
           <p style={{ fontSize: 17, color: 'var(--text-2)', lineHeight: 1.7, marginBottom: 32, maxWidth: 520 }}>
-            Binlerce araç sahibinin doğrulanmış şikayetleri, Claude AI analizi ve kronik
-            arıza haritası ile doğru aracı seçin.
+            Binlerce araç sahibinin doğrulanmış şikayetleri ve kronik arıza haritası ile doğru aracı seçin.
           </p>
           <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap' }}>
             <Link href="/sikayet-bildir" className="btn btn-primary btn-lg">
@@ -109,14 +102,14 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================
-          STATS — gerçek sayı (beta placeholder değil)
+          STATS
       ========================================================= */}
       <section style={{ borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)', background: '#fff' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto', padding: '32px 24px', display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0 }}>
           {[
             { label: 'Beta döneminde toplanan şikayet', to: 47, suffix: '' },
-            { label: 'Tespit edilen kronik sorun', to: 11, suffix: '' },
-            { label: 'Desteklenen araç modeli', to: 50, suffix: '+' },
+            { label: 'Tespit edilen kronik sorun',      to: 11, suffix: '' },
+            { label: 'Desteklenen araç modeli',         to: 50, suffix: '+' },
           ].map((stat, i) => (
             <div key={stat.label} style={{
               textAlign: 'center',
@@ -148,9 +141,14 @@ export default function HomePage() {
               key={cat.key}
               href={`/sikayetler?category=${cat.key}`}
               className="card card-hover"
-              style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 8, padding: 16 }}
+              style={{ textDecoration: 'none', display: 'flex', flexDirection: 'column', gap: 10, padding: 16 }}
             >
-              <span style={{ fontSize: 28 }}>{cat.emoji}</span>
+              <div style={{
+                width: 36, height: 36, borderRadius: 8,
+                background: 'var(--accent-light)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              }}>
+                <cat.Icon size={18} style={{ color: 'var(--accent)' }} />
+              </div>
               <span style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-1)', fontFamily: 'DM Sans, sans-serif' }}>{cat.label}</span>
               <span style={{ fontSize: 12, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif' }}>{cat.count} şikayet</span>
             </Link>
@@ -184,24 +182,16 @@ export default function HomePage() {
                   borderRadius: '50%',
                   background: active ? 'var(--accent)' : 'var(--bg-3)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  fontSize: 16,
                   transition: 'background 300ms ease',
                   zIndex: 1,
-                }}>{step.icon}</div>
+                }}>
+                  <step.Icon size={14} color={active ? '#fff' : 'var(--text-3)'} />
+                </div>
 
                 {/* Content */}
                 <div className="card" style={{ flex: 1, padding: '14px 16px' }}>
                   <div style={{ fontSize: 14, fontWeight: 500, color: 'var(--text-1)', fontFamily: 'DM Sans, sans-serif', marginBottom: 4 }}>{step.title}</div>
                   <div style={{ fontSize: 13, color: 'var(--text-2)', fontFamily: 'DM Sans, sans-serif' }}>{step.desc}</div>
-                  {/* AI loading animation on step 2 */}
-                  {i === 2 && active && (
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 8 }}>
-                      <div className="spinner" />
-                      <span style={{ fontSize: 12, color: 'var(--accent)', fontFamily: 'DM Mono, monospace', transition: 'opacity 300ms' }}>
-                        {AI_STEPS[aiStep]}
-                      </span>
-                    </div>
-                  )}
                 </div>
               </div>
             );
@@ -210,7 +200,7 @@ export default function HomePage() {
       </section>
 
       {/* =========================================================
-          RECENT COMPLAINTS — canlı feed
+          RECENT COMPLAINTS
       ========================================================= */}
       <section style={{ maxWidth: 1200, margin: '0 auto', padding: '64px 24px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>

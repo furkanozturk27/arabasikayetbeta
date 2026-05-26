@@ -4,23 +4,23 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { useAppStore } from '@/store/appStore';
-import { ChevronRight, Car, Brain } from 'lucide-react';
+import { ChevronRight, Car, Wrench, Settings, Disc, Zap, Wind, FileText, Shield, Palette, Sofa, Target, Circle, HelpCircle } from 'lucide-react';
 
 const CATEGORIES = [
-  { value: 'engine',       label: 'Motor',            emoji: '🔧' },
-  { value: 'transmission', label: 'Şanzıman',         emoji: '⚙️' },
-  { value: 'brakes',       label: 'Frenler',          emoji: '🛑' },
-  { value: 'suspension',   label: 'Süspansiyon',      emoji: '🏎️' },
-  { value: 'electrical',   label: 'Elektrik Sistemi', emoji: '⚡' },
-  { value: 'ac_heating',   label: 'Klima / Isıtma',   emoji: '❄️' },
-  { value: 'fuel_system',  label: 'Yakıt Sistemi',    emoji: '⛽' },
-  { value: 'exhaust',      label: 'Egzoz',            emoji: '💨' },
-  { value: 'body_paint',   label: 'Kaporta / Boya',   emoji: '🎨' },
-  { value: 'interior',     label: 'İç Mekan',         emoji: '🪑' },
-  { value: 'safety_systems', label: 'Güvenlik Sistemleri', emoji: '🛡️' },
-  { value: 'steering',     label: 'Direksiyon',       emoji: '🎯' },
-  { value: 'tires_wheels', label: 'Lastik / Jant',    emoji: '🔵' },
-  { value: 'other',        label: 'Diğer',            emoji: '❓' },
+  { value: 'engine',         label: 'Motor',               Icon: Wrench   },
+  { value: 'transmission',   label: 'Şanzıman',            Icon: Settings },
+  { value: 'brakes',         label: 'Frenler',             Icon: Disc     },
+  { value: 'suspension',     label: 'Süspansiyon',         Icon: Car      },
+  { value: 'electrical',     label: 'Elektrik Sistemi',    Icon: Zap      },
+  { value: 'ac_heating',     label: 'Klima / Isıtma',      Icon: Wind     },
+  { value: 'fuel_system',    label: 'Yakıt Sistemi',       Icon: FileText },
+  { value: 'exhaust',        label: 'Egzoz',               Icon: Wind     },
+  { value: 'body_paint',     label: 'Kaporta / Boya',      Icon: Palette  },
+  { value: 'interior',       label: 'İç Mekan',            Icon: Sofa     },
+  { value: 'safety_systems', label: 'Güvenlik Sistemleri', Icon: Shield   },
+  { value: 'steering',       label: 'Direksiyon',          Icon: Target   },
+  { value: 'tires_wheels',   label: 'Lastik / Jant',       Icon: Circle   },
+  { value: 'other',          label: 'Diğer',               Icon: HelpCircle },
 ];
 
 const SYMPTOMS_BY_CATEGORY: Record<string, string[]> = {
@@ -40,7 +40,7 @@ const SYMPTOMS_BY_CATEGORY: Record<string, string[]> = {
   other: ['Diğer belirti'],
 };
 
-const AI_LOADING_STEPS = ['Taranıyor…', 'Analiz ediliyor…', 'Tamamlanıyor…'];
+
 
 const STEP_LABELS = ['Araç Seç', 'Kategori', 'Detaylar', 'Gözden Geçir'];
 
@@ -53,7 +53,6 @@ export default function SikayetBildirPage() {
 
   const [vd, setVd] = useState({ brands: [] as string[], models: [] as string[], years: [] as number[], engines: [] as string[], vehicleId: null as string | null });
   const [submitting, setSubmitting] = useState(false);
-  const [aiStep, setAiStep] = useState(0);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -98,10 +97,6 @@ export default function SikayetBildirPage() {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) { router.push('/giris'); return; }
 
-    // AI loading animation
-    let step = 0;
-    const interval = setInterval(() => { setAiStep(s => (s + 1) % AI_LOADING_STEPS.length); }, 1000);
-
     const res = await fetch('/api/complaints', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -117,15 +112,15 @@ export default function SikayetBildirPage() {
     });
 
     const complaint = await res.json();
-    if (!res.ok) { clearInterval(interval); setError(complaint.error || 'Bir hata oluştu.'); setSubmitting(false); return; }
+    if (!res.ok) { setError(complaint.error || 'Bir hata oluştu.'); setSubmitting(false); return; }
 
-    await fetch('/api/ai/analyze', {
+    // Fire-and-forget analysis (AI feature disabled for now; kept for future re-enablement)
+    fetch('/api/ai/analyze', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ complaintId: complaint.id }),
-    });
+    }).catch(() => {});
 
-    clearInterval(interval);
     resetComplaintDraft();
     router.push(`/sikayetler/${complaint.id}?new=1`);
   }
@@ -145,7 +140,7 @@ export default function SikayetBildirPage() {
           Şikayet Bildir
         </h1>
         <p style={{ fontSize: 14, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif' }}>
-          Araç arızanızı adım adım kaydedin, AI analizi alın.
+          Araç arızanızı adım adım kaydedin ve topluluğa katkıda bulunun.
         </p>
       </div>
 
@@ -222,24 +217,27 @@ export default function SikayetBildirPage() {
             Arıza Kategorisi
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginBottom: 24 }}>
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.value}
-                onClick={() => setComplaintDraft({ category: cat.value, symptoms: [] })}
-                style={{
-                  display: 'flex', alignItems: 'center', gap: 10,
-                  padding: '12px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
-                  border: `1px solid ${complaintDraft.category === cat.value ? 'var(--accent)' : 'var(--border)'}`,
-                  background: complaintDraft.category === cat.value ? 'var(--accent-light)' : '#fff',
-                  transition: 'all var(--ease)', fontFamily: 'DM Sans, sans-serif',
-                }}
-              >
-                <span style={{ fontSize: 20 }}>{cat.emoji}</span>
-                <span style={{ fontSize: 13, fontWeight: complaintDraft.category === cat.value ? 500 : 400, color: complaintDraft.category === cat.value ? 'var(--accent)' : 'var(--text-1)' }}>
-                  {cat.label}
-                </span>
-              </button>
-            ))}
+            {CATEGORIES.map(cat => {
+              const isSelected = complaintDraft.category === cat.value;
+              return (
+                <button
+                  key={cat.value}
+                  onClick={() => setComplaintDraft({ category: cat.value, symptoms: [] })}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '12px 14px', borderRadius: 10, textAlign: 'left', cursor: 'pointer',
+                    border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
+                    background: isSelected ? 'var(--accent-light)' : '#fff',
+                    transition: 'all var(--ease)', fontFamily: 'DM Sans, sans-serif',
+                  }}
+                >
+                  <cat.Icon size={16} style={{ color: isSelected ? 'var(--accent)' : 'var(--text-3)', flexShrink: 0 }} />
+                  <span style={{ fontSize: 13, fontWeight: isSelected ? 500 : 400, color: isSelected ? 'var(--accent)' : 'var(--text-1)' }}>
+                    {cat.label}
+                  </span>
+                </button>
+              );
+            })}
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
             <button className="btn btn-secondary" onClick={() => setComplaintStep(0)}>Geri</button>
@@ -372,7 +370,7 @@ export default function SikayetBildirPage() {
               </div>
             ))}
             {complaintDraft.isRecurring && (
-              <span className="pill pill-recurring" style={{ alignSelf: 'flex-start' }}>⚠️ Tekrarlayan sorun</span>
+              <span className="pill pill-recurring" style={{ alignSelf: 'flex-start' }}>Tekrarlayan sorun</span>
             )}
           </div>
 
@@ -382,17 +380,10 @@ export default function SikayetBildirPage() {
             </div>
           )}
 
-          {submitting && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: '12px 14px', borderRadius: 8, background: 'var(--bg-2)', border: '1px solid var(--border)', marginBottom: 16 }}>
-              <div className="spinner" />
-              <span style={{ fontSize: 14, color: 'var(--accent)', fontFamily: 'DM Mono, monospace' }}>
-                {AI_LOADING_STEPS[aiStep]}
-              </span>
-            </div>
-          )}
+
 
           <p style={{ fontSize: 13, color: 'var(--text-3)', fontFamily: 'DM Sans, sans-serif', marginBottom: 16 }}>
-            Gönderilince Claude AI analizi başlatılır. Sonuçlar birkaç saniye içinde görüntülenir.
+            Şikayetiniz kaydedildikten sonra diğer kullanıcılar tarafından görüntülenebilecektir.
           </p>
 
           <div style={{ display: 'flex', gap: 10 }}>
@@ -403,9 +394,9 @@ export default function SikayetBildirPage() {
               onClick={handleSubmit}
             >
               {submitting ? (
-                <><div className="spinner" style={{ borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} /> İşleniyor…</>
+                <><div className="spinner" style={{ borderTopColor: '#fff', borderColor: 'rgba(255,255,255,0.3)' }} /> Kaydediliyor…</>
               ) : (
-                <><Brain size={16} /> Şikayeti Gönder & AI Analizi Al</>
+                <>Şikayeti Gönder <ChevronRight size={16} /></>
               )}
             </button>
           </div>

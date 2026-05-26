@@ -12,10 +12,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 const VERDICT_PILL: Record<string, { label: string; cls: string }> = {
-  chronic:    { label: '🚨 Kronik',   cls: 'pill pill-chronic'   },
-  common:     { label: '⚠️ Yaygın',   cls: 'pill pill-recurring' },
-  isolated:   { label: '🔍 İzole',    cls: 'pill pill-info'      },
-  user_error: { label: '💡 Kullanım', cls: 'pill pill-neutral'   },
+  chronic:    { label: 'Kronik',          cls: 'pill pill-chronic'   },
+  common:     { label: 'Yaygın',          cls: 'pill pill-recurring' },
+  isolated:   { label: 'İzole',            cls: 'pill pill-info'      },
+  user_error: { label: 'Kullanım Hatası', cls: 'pill pill-neutral'   },
 };
 
 const SEVERITY_PILL: Record<number, string> = {
@@ -90,7 +90,7 @@ export default async function SikayetlerPage({
       <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginBottom: 32 }}>
         {[
           { label: 'Tümü', href: '/sikayetler', active: !filters.category && !filters.chronic },
-          { label: '🚨 Kronik', href: '/sikayetler?chronic=1', active: filters.chronic === '1' },
+          { label: 'Kronik', href: '/sikayetler?chronic=1', active: filters.chronic === '1' },
           ...Object.entries(CATEGORY_LABELS).map(([k, v]) => ({
             label: v,
             href: `/sikayetler?category=${k}`,
